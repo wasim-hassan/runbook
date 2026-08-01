@@ -10,20 +10,26 @@ Postfix on stmail01 silently stopped serving the monitoring app. Root cause: `ma
 
 ### Commands
 
+1. Get on the mail server (NOT jump-host)
 ```sh
-# 1. Get on the mail server (NOT jump-host)
 ssh groot@stmail01
+```
 
-# 2. Diagnose — confirm it's dead and why
+2. Diagnose — confirm it's dead and why
+```sh
 systemctl status postfix                    # inactive (dead), disabled
 ss -tlnp | grep 25                          # nothing listening on SMTP
 sudo postfix check                          # THE key command — flags the duplicate line
 sudo postconf -n inet_interfaces            # shows effective value (localhost = the bug)
+```
 
-# 3. Fix — comment out the stock default line (line 135) that overrides "all"
+3. Fix — comment out the stock default line (line 135) that overrides "all"
+```sh
 sudo sed -i '135s/^/#/' /etc/postfix/main.cf
+```
 
-# 4. Start + enable on boot
+4. Start + enable on boot
+```sh
 sudo systemctl start postfix
 sudo systemctl enable postfix
 ```
