@@ -15,23 +15,20 @@ Install HAProxy on the LBR server (stlb01), add all three app servers to its loa
 ### Commands
 
 ```sh
-# 1. Get on the LBR server (NOT jump-host, NOT an app server)
-ssh loki@stlb01                       # password: Mischi3f
-
-# 2. Install via yum only
+# 1. Install via yum only
 sudo yum install haproxy -y
 
-# 3. Resolve app server IPs (dynamic per environment — always look them up)
+# 2. Resolve app server IPs (dynamic per environment — always look them up)
 getent hosts stapp01 stapp02 stapp03
 
-# 4. Edit the config
+# 3. Edit the config
 sudo vi /etc/haproxy/haproxy.cfg
 #   - frontend main:  bind *:5000  -->  bind *:80
 #   - backend app:    replace placeholder servers with the 3 real app servers on :8087
 #   - keep "stats socket /var/lib/haproxy/stats" untouched
 #   - delete any leftover placeholder lines (e.g. app4)
 
-# 5. Validate, start, enable
+# 4. Validate, start, enable
 sudo haproxy -c -f /etc/haproxy/haproxy.cfg
 sudo systemctl restart haproxy
 sudo systemctl enable haproxy
